@@ -1,0 +1,41 @@
+<html>
+<head>
+    <title>ocr-bye</title>
+    <meta charset="utf-8"/>
+    <script type="text/javascript" src="js/html2canvas.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+    <style type="text/css">
+        .icon-over {
+            /*width:45px;*/
+            /*height:45px;*/
+            line-height: 45px;
+            text-align: center;
+            color: #EF784B;
+            font-size: 12px;
+            /*border-radius: 50%;*/
+        }
+    </style>
+</head>
+<body>
+
+样式：
+<div id="toimg">
+    <b>这里显示html预览</b>
+</div>
+
+<div >
+    <textarea id="txt_content" style="width: 400px; height: 500px;">
+        倘若人生可以重开，是选择青囊竹杖，救苦一方？又或者出生富贵，锦衣怒马？再譬如武功盖世，威震武林？
+    </textarea>
+</div>
+
+<div>
+    <button onclick=textToImg();>生成图片</button>
+</div>
+<div>
+    <p>图片：</p>
+    <img id="img-base64" style="border: 1px solid"/>
+</div>
+
+</body>
+</html>

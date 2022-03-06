@@ -10,28 +10,59 @@
 </head>
 <body>
 
-<div id="toimg" class="html2canvas-container" ></div>
+<div id="toimg" class="html2canvas-container"></div>
 
-<div>
+<tbody>
+<tr>
+    <td></td>
+    <td>
+        <div>
     <textarea id="txt_content" style="width: 400px; height: 500px;">
         倘若人生可以重开，是选择青囊竹杖，救苦一方？又或者出生富贵，锦衣怒马？再譬如武功盖世，威震武林？
     </textarea>
-</div>
-<div>
-    <label for="word_num">每行字數：</label>
-    <input type="number" id="word_num" min="10" value="20">
-</div>
-<div>
-    <label for="word_size">字體大小（單位：px）：</label>
-    <input type="number" id="word_size" min="1" value="20">个
-</div>
-<div>
-    <label for="img_size_x">圖片大小（單位：px）：</label>
-    寬=<input type="number" id="img_size_x" min="10" value="500">
-    <b>x</b>
-    高=<input type="number" id="img_size_y" min="10" value="500">
+        </div>
+    </td>
+</tr>
+<tr>
+    <td></td>
+    <td><div>
+        <label for="word_num">每行字數（【大于0】）：</label>
+        <input type="number" id="word_num" min="10" value="20">
+    </div></td>
+</tr>
+<tr>
+    <td></td>
+    <td><div>
+        <label for="word_size">字體大小（【大于0】，單位：px）：</label>
+        <input type="number" id="word_size" min="1" value="20">个
+    </div></td>
+</tr>
+<tr>
+    <td></td>
+    <td><div>
+        <label for="img_size_x">圖片大小（【大于0】，單位：px）：</label>
+        寬=<input type="number" id="img_size_x" min="10" value="500">
+        <b>x</b>
+        高=<input type="number" id="img_size_y" min="10" value="500">
+    </div></td>
+</tr>
+<tr>
+    <td></td>
+    <td>
+        <div>
+            <label for="rotate_max">文字旋转角度范围（【-180 ~ 180】，單位：°）：</label>
+            最小角度=<input type="number" id="rotate_min" value="0">
+            <b> ~ </b>
+            最大角度=<input type="number" id="rotate_max" value="360">
+        </div>
+    </td>
+</tr>
+</tbody>
 
-</div>
+
+
+
+
 
 <div>
     <button onclick=textToImg();>生成图片</button>

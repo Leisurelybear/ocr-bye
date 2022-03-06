@@ -15,6 +15,9 @@ function textToImg() {
     let imgSizeX = document.getElementById("img_size_x").value
     let imgSizeY = document.getElementById("img_size_y").value
 
+    let wordRotateMin = parseInt(document.getElementById("rotate_min").value)
+    let wordRotateMax = parseInt(document.getElementById("rotate_max").value)
+    console.log("角度范围：", wordRotateMin, wordRotateMax)
 
     // 找到文本框内容
     let text = document.getElementById("txt_content").value
@@ -28,6 +31,9 @@ function textToImg() {
     // 設置圖片大小
     toImgElement.setAttribute("style", "width: " + imgSizeX + "px !important;height: " + imgSizeY + "px !important;")
 
+
+
+
     //创建子节点
     let tb = document.createElement("table")
 
@@ -38,15 +44,15 @@ function textToImg() {
         let tr = document.createElement("tr")
         for (let j = 0; j < rowWordNum; j++) {
             wordIndex = i * rowWordNum + j
-            console.log(wordIndex, words[j])
+            // console.log(wordIndex, words[j])
             let td = document.createElement("td")
             let innerDiv = document.createElement("div")
             innerDiv.innerText = words[wordIndex] ? words[wordIndex] : " "
             // 字體旋轉
-            innerDiv.setAttribute("style", "transform:rotate(" + random(0, 360) + "deg);")
+            innerDiv.setAttribute("style", "transform:rotate(" + random(wordRotateMin, wordRotateMax) + "deg);")
             // 字體大小
             tmpWordSize = parseInt(wordSize) + random(0, 0)
-            console.log(wordSize)
+            // console.log(wordSize)
             innerDiv.setAttribute("style", innerDiv.getAttribute("style") + "font-size: " + tmpWordSize + "px;")
 
 

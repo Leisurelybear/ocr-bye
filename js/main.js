@@ -19,6 +19,8 @@ function textToImg() {
     let wordRotateMax = parseInt(document.getElementById("rotate_max").value)
     console.log("角度范围：", wordRotateMin, wordRotateMax)
 
+    let line_nums = document.getElementById("line_nums").value
+
     // 找到文本框内容
     let text = document.getElementById("txt_content").value
     text = text.trim()
@@ -28,8 +30,6 @@ function textToImg() {
     let toImgElement = document.getElementById("toimg")
     toImgElement.innerHTML = ""
     toImgElement.removeAttribute("hidden")
-    // 設置圖片大小
-    toImgElement.setAttribute("style", "width: " + imgSizeX + "px !important;height: " + imgSizeY + "px !important;")
 
 
 
@@ -59,18 +59,26 @@ function textToImg() {
             td.appendChild(innerDiv)
             tr.appendChild(td)
         }
-        words.forEach(function (_, i) {
-
-        })
+        // words.forEach(function (_, i) {
+        //     // 这里可以对单个字进行处理，考虑改颜色，转圈
+        // })
         tb.appendChild(tr)
     }
 
     toImgElement.appendChild(tb)
 
+    // 設置圖片大小
+    imgSizeX = rowWordNum * wordSize*1.414
+    imgSizeY = (rows + 1) * wordSize * 1.414 // 勾股定理，根號2，+1為補償，防止漢字割裂
+    toImgElement.setAttribute("style", "width: " + imgSizeX + "px !important;height: " + imgSizeY + "px !important;")
 
     // html 转换 canvas，canvas转换图片
     html2canvas(document.getElementById("toimg")).then(function (canvas) {
         let img = document.getElementById("img-base64");
+        for(let i = 0; i < line_nums; i++) {
+            // 绘制干扰线
+            drawline(canvas, canvas.getContext("2d"))
+        }
         img.src = canvas.toDataURL("image/png");
     })
     toImgElement.setAttribute("hidden", true)
@@ -78,6 +86,19 @@ function textToImg() {
 
 }
 
+// 生成随机数
 function random(min, max) {
     return Math.round(Math.random() * (max - min)) + min;
+}
+
+// 绘制干扰线
+function drawline(canvas, context) {
+    //若省略beginPath，则每点击一次验证码会累积干扰线的条数
+    context.beginPath();
+    //起点与终点在canvas宽高内随机
+    context.moveTo(Math.floor(Math.random() * canvas.width), Math.floor(Math.random() * canvas.height));
+    context.lineTo(Math.floor(Math.random() * canvas.width), Math.floor(Math.random() * canvas.height));
+    context.lineWidth = 1;
+    context.strokeStyle = '#275DB3';
+    context.stroke();
 }

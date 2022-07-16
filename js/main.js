@@ -12,8 +12,8 @@ function textToImg() {
         wordSize = 10
     }
 
-    let imgSizeX = document.getElementById("img_size_x").value
-    let imgSizeY = document.getElementById("img_size_y").value
+    // let imgSizeX = document.getElementById("img_size_x").value
+    // let imgSizeY = document.getElementById("img_size_y").value
 
     let wordRotateMin = parseInt(document.getElementById("rotate_min").value)
     let wordRotateMax = parseInt(document.getElementById("rotate_max").value)

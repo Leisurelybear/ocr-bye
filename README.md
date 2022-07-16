@@ -19,4 +19,7 @@ Stay away from OCR , convert your words into image which can not be recognized e
 Put this project in anywhere you can visit, then open `index.html` with your browser.
 
 ## Snapshot
+Example：
 ![示例](img/img1.png)
+Recognized Result by PandaOCR:
+![示例2](img/img2.png)

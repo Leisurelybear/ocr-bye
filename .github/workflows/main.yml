@@ -1,5 +1,7 @@
 name: Deploy
 on: [push]
+env: 
+  CODE_HOME: "/home/jason/www/html/public/ocr-bye"
 jobs:
   my-job:
     runs-on: self-hosted
@@ -8,5 +10,12 @@ jobs:
       uses: actions/checkout@v2
     - name: Deploy demo to blog
       run: |
-        cd /home/jason/www/html/public
-        git clone https://github.com/Leisurelybear/ocr-bye.git
+        if [ -d "$CODE_HOME" ]; then
+          cd "$CODE_HOME"
+          git pull
+          echo "Code updated in $CODE_HOME."
+        else
+          git clone https://github.com/Leisurelybear/ocr-bye.git "$CODE_HOME"
+          echo "Code cloned to $CODE_HOME."
+        fi
+        

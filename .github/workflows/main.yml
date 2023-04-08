@@ -1,5 +1,7 @@
 name: Deploy
 on: [push]
+env: 
+  CODE_HOME: "/home/jason/www/html/public/ocr-bye"
 jobs:
   my-job:
     runs-on: self-hosted
@@ -8,15 +10,12 @@ jobs:
       uses: actions/checkout@v2
     - name: Deploy demo to blog
       run: |
-        cd /home/jason/www/html/public
-        dir_name="/home/jason/www/html/public/ocr_bye"
-        if [ ! -d "$dir_name" ]; then
-          git clone https://github.com/Leisurelybear/ocr-bye.git
-          echo "Clone successfully."
-        else
-          echo "Folder $dir_name already exists, ready to pull."
-          cd $dir_name
+        if [ -d "$CODE_HOME" ]; then
+          cd "$CODE_HOME"
           git pull
-          echo "Update successfully."
+          echo "Code updated in $CODE_HOME."
+        else
+          git clone https://github.com/Leisurelybear/ocr-bye.git "$CODE_HOME"
+          echo "Code cloned to $CODE_HOME."
         fi
         

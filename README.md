@@ -28,6 +28,10 @@ Recognized Result by PandaOCR:
 ![示例2](img/img2.png)
 
 ## Updates
+
+### 23/04/08
+- 添加github action，自动部署demo
+
 ### 23/04/08
 - 美化頁面結構（by chatGPT）
 - 添加橫格綫，讓生成的圖片更加整齊

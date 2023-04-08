@@ -1,0 +1,12 @@
+name: Deploy
+on: [push]
+jobs:
+  my-job:
+    runs-on: self-hosted
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Deploy demo to blog
+      run: |
+        cd /home/jason/www/html/public
+        git clone https://github.com/Leisurelybear/ocr-bye.git

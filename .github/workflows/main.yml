@@ -9,4 +9,14 @@ jobs:
     - name: Deploy demo to blog
       run: |
         cd /home/jason/www/html/public
-        git clone https://github.com/Leisurelybear/ocr-bye.git
+        dir_name="/home/jason/www/html/public/ocr_bye"
+        if [ ! -d "$dir_name" ]; then
+          git clone https://github.com/Leisurelybear/ocr-bye.git
+          echo "Clone successfully."
+        else
+          echo "Folder $dir_name already exists, ready to pull."
+          cd $dir_name
+          git pull
+          echo "Update successfully."
+        fi
+        

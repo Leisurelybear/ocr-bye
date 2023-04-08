@@ -4,8 +4,69 @@
     <meta charset="utf-8"/>
     <script type="text/javascript" src="js/html2canvas.js"></script>
     <script type="text/javascript" src="js/main.js"></script>
-    <style type="text/css">
+    <style>
+        body {
+            background-color: #f1f1f1;
+            font-family: Arial, sans-serif;
+        }
+        label {
+            font-size: 18px;
+            margin-right: 10px;
+        }
 
+        input[type="number"] {
+            font-size: 16px;
+            width: 80px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            padding: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #3e8e41;
+        }
+
+        img {
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+        }
+
+        textarea {
+            float: left;
+            margin-right: 10px;
+        }
+
+        #txt_content {
+            letter-spacing: 1px;
+            resize: none;
+        }
+
+        #word_num, #word_size, #rotate_min, #rotate_max, #line_nums {
+            width: 60px;
+        }
+
+        button {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+
+        #img-base64 {
+            margin-top: 20px;
+            max-width: 1000px;
+        }
     </style>
 </head>
 <body>
@@ -17,40 +78,30 @@
     <td></td>
     <td>
         <div>
-    <textarea id="txt_content" style="width: 400px; height: 500px;letter-spacing: 1px">
-        倘若人生可以重开，是选择青囊竹杖，救苦一方？又或者出生富贵，锦衣怒马？再譬如武功盖世，威震武林？
-    </textarea>
+    <textarea id="txt_content" style="width: 400px; height: 500px;letter-spacing: 1px" oninput="textToImg()">
+倘若人生可以重开，是选择青囊竹杖，救苦一方？又或者出生富贵，锦衣怒马？再譬如武功盖世，威震武林？</textarea>
         </div>
     </td>
 </tr>
 <tr>
     <td></td>
     <td><div>
-        <label for="word_num">每行字數（【大于0】）：</label>
-        <input type="number" id="word_num" min="10" value="20">
+        <label for="word_num">①每行字數（【大于0】）：</label>
+        <input type="number" id="word_num" min="10" value="20">个
     </div></td>
 </tr>
 <tr>
     <td></td>
     <td><div>
-        <label for="word_size">字體大小（【大于0】，單位：px）：</label>
-        <input type="number" id="word_size" min="1" value="20">个
+        <label for="word_size">②字體大小（【大于0】，單位：px）：</label>
+        <input type="number" id="word_size" min="1" value="20">
     </div></td>
 </tr>
-<!--<tr>-->
-<!--    <td></td>-->
-<!--    <td><div>-->
-<!--        <label for="img_size_x">圖片大小（【大于0】，單位：px）：</label>-->
-<!--        寬=<input type="number" id="img_size_x" min="10" value="500">-->
-<!--        <b>x</b>-->
-<!--        高=<input type="number" id="img_size_y" min="10" value="500">-->
-<!--    </div></td>-->
-<!--</tr>-->
 <tr>
     <td></td>
     <td>
         <div>
-            <label for="rotate_max">文字旋转角度范围（【-180 ~ 180】，單位：°）：</label>
+            <label for="rotate_max">③文字旋转角度范围（【-180 ~ 180】，單位：°）：</label>
             最小角度=<input type="number" id="rotate_min" value="0">
             <b> ~ </b>
             最大角度=<input type="number" id="rotate_max" value="360">
@@ -61,23 +112,26 @@
     <td></td>
     <td>
         <div>
-            <label for="rotate_max">繪製干擾綫數量：</label>
-            <input type="number" id="line_nums" value="0">
+            <label for="rotate_max">④繪製干擾綫數量：</label>
+            <input type="number" id="line_nums" value="5">
+        </div>
+    </td>
+</tr>
+<tr>
+    <td></td>
+    <td>
+        <div>
+            <label for="rotate_max">⑤添加横格綫：</label>
+            <input type="checkbox" id="underline" checked>
         </div>
     </td>
 </tr>
 </tbody>
-
-
-
-
-
-
 <div>
     <button onclick=textToImg();>生成图片</button>
 </div>
 <div>
-    <p>图片：</p>
+    <p>文字圖片：</p>
     <img id="img-base64" style="border: 1px solid"/>
 </div>
 

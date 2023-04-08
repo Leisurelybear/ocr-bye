@@ -72,6 +72,14 @@ function textToImg() {
     imgSizeY = (rows + 1) * wordSize * 1.414 // 勾股定理，根號2，+1為補償，防止漢字割裂
     toImgElement.setAttribute("style", "width: " + imgSizeX + "px !important;height: " + imgSizeY + "px !important;")
 
+    // 添加橫格綫
+    if (document.getElementById("underline").checked){
+        const trList = document.querySelectorAll('tr');
+        trList.forEach(tr => {
+            tr.style.borderBottom = '1px solid #000000';
+        });
+    }
+
     // html 转换 canvas，canvas转换图片
     html2canvas(document.getElementById("toimg")).then(function (canvas) {
         let img = document.getElementById("img-base64");

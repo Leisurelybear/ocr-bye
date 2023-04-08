@@ -9,6 +9,7 @@ Stay away from OCR , convert your words into image which can not be recognized e
 - 文字设置大小
 - 生成图片自适应大小
 - 每行字数设置
+- 添加橫格綫
 - todo：文字随机大小
 - todo：干扰线粗细随机
 - todo：火星文替换
@@ -25,3 +26,8 @@ Example：
 ![示例](img/img1.png)
 Recognized Result by PandaOCR:
 ![示例2](img/img2.png)
+
+## Updates
+### 23/04/08
+- 美化頁面結構（by chatGPT）
+- 添加橫格綫，讓生成的圖片更加整齊

@@ -141,6 +141,51 @@
 <div>
     <p>文字圖片：</p>
     <img id="img-base64" style="border: 1px solid"/>
+    <br/>
+    <button id="copy-btn">复制图片</button>
+    <span id="alert" style="display:none"></span>
+    <script>
+        const img = document.querySelector('#img-base64');
+        const copyBtn = document.querySelector('#copy-btn');
+        const alertBox = document.getElementById('alert');
+        timeoutID = ""
+        copyBtn.addEventListener('click', () => {
+            clearTimeout(timeoutID)
+            // 将图片渲染到canvas上
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+
+            // 生成Blob对象
+            canvas.toBlob(blob => {
+                // 将Blob对象放入剪贴板
+                navigator.clipboard.write([
+                    new ClipboardItem({
+                        'image/png': blob
+                    })
+                ]).then(() => {
+                    showAlert('复制成功', true)
+                }).catch(() => {
+                    showAlert('复制失败，请手动复制', false)
+                });
+            }, 'image/png');
+        });
+
+        function showAlert(message, success) {
+            alertBox.textContent = message;
+            alertBox.style.display = 'block';
+            if (success) {
+                alertBox.style.backgroundColor = 'green';
+            } else {
+                alertBox.style.backgroundColor = 'red';
+            }
+            timeoutID = setTimeout(() => {
+                alertBox.style.display = 'none';
+            }, 3000);
+        }
+    </script>
 </div>
 
 </body>

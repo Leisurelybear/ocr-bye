@@ -29,6 +29,9 @@ Recognized Result by PandaOCR:
 
 ## Updates
 
+### 23/04/12
+- 添加一键复制图片功能
+
 ### 23/04/08
 - 添加github action，自动部署demo
 

@@ -54,7 +54,9 @@
             resize: none;
         }
 
-        #word_num, #word_size, #rotate_min, #rotate_max, #line_nums {
+        #word_num, #word_size, #rotate_min, #rotate_max, #line_nums,
+        #size_delta_min, #size_delta_max, #line_width_min, #line_width_max,
+        #stretch_x_min, #stretch_x_max, #stretch_y_min, #stretch_y_max {
             width: 60px;
         }
 
@@ -123,6 +125,58 @@
         <div>
             <label for="rotate_max">⑤添加横格綫：</label>
             <input type="checkbox" id="underline" checked>
+        </div>
+    </td>
+</tr>
+<tr>
+    <td></td>
+    <td>
+        <div>
+            <label for="enable_random_size">⑥文字随机大小：</label>
+            <input type="checkbox" id="enable_random_size" checked>
+            偏移范围=
+            <input type="number" id="size_delta_min" value="-2">
+            ~
+            <input type="number" id="size_delta_max" value="2">px
+        </div>
+    </td>
+</tr>
+<tr>
+    <td></td>
+    <td>
+        <div>
+            <label for="enable_random_line_width">⑦干扰线粗细随机：</label>
+            <input type="checkbox" id="enable_random_line_width" checked>
+            线宽范围=
+            <input type="number" id="line_width_min" value="0.8" step="0.1">
+            ~
+            <input type="number" id="line_width_max" value="2.2" step="0.1">
+        </div>
+    </td>
+</tr>
+<tr>
+    <td></td>
+    <td>
+        <div>
+            <label for="enable_martian">⑧火星文替换：</label>
+            <input type="checkbox" id="enable_martian" checked>
+        </div>
+    </td>
+</tr>
+<tr>
+    <td></td>
+    <td>
+        <div>
+            <label for="enable_stretch">⑨文字拉升变形：</label>
+            <input type="checkbox" id="enable_stretch" checked>
+            X轴=
+            <input type="number" id="stretch_x_min" value="0.85" step="0.05">
+            ~
+            <input type="number" id="stretch_x_max" value="1.15" step="0.05">
+            Y轴=
+            <input type="number" id="stretch_y_min" value="0.85" step="0.05">
+            ~
+            <input type="number" id="stretch_y_max" value="1.15" step="0.05">
         </div>
     </td>
 </tr>

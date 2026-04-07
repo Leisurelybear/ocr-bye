@@ -5,53 +5,122 @@
     <script type="text/javascript" src="js/html2canvas.js"></script>
     <script type="text/javascript" src="js/main.js"></script>
     <style>
-        body {
-            background-color: #f1f1f1;
-            font-family: Arial, sans-serif;
+        * {
+            box-sizing: border-box;
         }
+
+        body {
+            margin: 0;
+            padding: 24px;
+            background-color: #f5f7fb;
+            font-family: Arial, sans-serif;
+            color: #1f2937;
+        }
+
+        .app {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .title {
+            margin: 0 0 16px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(460px, 560px) 1fr;
+            gap: 16px;
+            align-items: start;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 14px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+            padding: 16px;
+        }
+
+        .card h2 {
+            margin: 0 0 12px;
+            font-size: 20px;
+        }
+
+        .field {
+            margin-bottom: 10px;
+            line-height: 1.8;
+        }
+
         label {
-            font-size: 18px;
-            margin-right: 10px;
+            font-size: 15px;
+            margin-right: 8px;
+            color: #374151;
         }
 
         input[type="number"] {
-            font-size: 16px;
+            font-size: 14px;
             width: 80px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            padding: 5px;
-        }
-        button {
-            background-color: #4CAF50;
-            border: none;
-            color: white;
-            padding: 10px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 10px 0;
-            cursor: pointer;
-            border-radius: 5px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            padding: 5px 8px;
         }
 
-        button:hover {
-            background-color: #3e8e41;
-        }
-
-        img {
-            border-radius: 10px;
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+        input[type="checkbox"] {
+            transform: translateY(1px);
         }
 
         textarea {
-            float: left;
-            margin-right: 10px;
+            width: 100%;
+            min-height: 360px;
+            resize: vertical;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 15px;
+            line-height: 1.7;
+            letter-spacing: 1px;
+            outline: none;
         }
 
-        #txt_content {
-            letter-spacing: 1px;
-            resize: none;
+        textarea:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+
+        .btn {
+            background-color: #4f46e5;
+            border: none;
+            color: white;
+            padding: 10px 16px;
+            font-size: 15px;
+            margin: 0;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: #4338ca;
+        }
+
+        .btn + .btn {
+            margin-left: 8px;
+        }
+
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tips {
+            font-size: 13px;
+            color: #6b7280;
+            margin-top: 8px;
         }
 
         #word_num, #word_size, #rotate_min, #rotate_max, #line_nums,
@@ -60,187 +129,166 @@
             width: 60px;
         }
 
-        button {
-            margin-top: 20px;
-            font-size: 20px;
+        #img-base64 {
+            margin-top: 8px;
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.15);
+            border: 1px solid #d1d5db;
+            background: #fff;
         }
 
-        #img-base64 {
-            margin-top: 20px;
-            max-width: 1000px;
+        #alert {
+            display: none;
+            color: #fff;
+            border-radius: 8px;
+            padding: 4px 10px;
+            font-size: 13px;
+            margin-left: 8px;
+        }
+
+        #toimg table {
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        #toimg td {
+            padding: 0;
+        }
+
+        #toimg {
+            position: fixed;
+            left: -99999px;
+            top: 0;
+            background: transparent;
+        }
+
+        @media (max-width: 1080px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
 
 <div id="toimg" class="html2canvas-container"></div>
-
-<tbody>
-<tr>
-    <td></td>
-    <td>
-        <div>
-    <textarea id="txt_content" style="width: 400px; height: 500px;letter-spacing: 1px" oninput="textToImg()">
-倘若人生可以重开，是选择青囊竹杖，救苦一方？又或者出生富贵，锦衣怒马？再譬如武功盖世，威震武林？</textarea>
+<div class="app">
+    <h1 class="title">OCR-BYE 文字转图片防 OCR 工具</h1>
+    <div class="layout">
+        <div class="card">
+            <h2>输入与参数</h2>
+            <div class="field">
+                <textarea id="txt_content" oninput="textToImg()">倘若人生可以重开，是选择青囊竹杖，救苦一方？又或者出生富贵，锦衣怒马？再譬如武功盖世，威震武林？</textarea>
+            </div>
+            <div class="field">
+                <label for="word_num">①每行字数：</label>
+                <input type="number" id="word_num" min="10" value="20"> 个
+            </div>
+            <div class="field">
+                <label for="word_size">②字体大小（px）：</label>
+                <input type="number" id="word_size" min="1" value="20">
+            </div>
+            <div class="field">
+                <label for="rotate_min">③旋转角度范围（°）：</label>
+                最小 <input type="number" id="rotate_min" value="0">
+                ~ 最大 <input type="number" id="rotate_max" value="360">
+            </div>
+            <div class="field">
+                <label for="line_nums">④干扰线数量：</label>
+                <input type="number" id="line_nums" value="5">
+            </div>
+            <div class="field">
+                <label for="underline">⑤添加横格线：</label>
+                <input type="checkbox" id="underline" checked>
+            </div>
+            <div class="field">
+                <label for="enable_random_size">⑥文字随机大小：</label>
+                <input type="checkbox" id="enable_random_size" checked>
+                偏移 <input type="number" id="size_delta_min" value="-2"> ~ <input type="number" id="size_delta_max" value="2"> px
+            </div>
+            <div class="field">
+                <label for="enable_random_line_width">⑦干扰线粗细随机：</label>
+                <input type="checkbox" id="enable_random_line_width" checked>
+                线宽 <input type="number" id="line_width_min" value="0.8" step="0.1"> ~ <input type="number" id="line_width_max" value="2.2" step="0.1">
+            </div>
+            <div class="field">
+                <label for="enable_martian">⑧火星文替换：</label>
+                <input type="checkbox" id="enable_martian" checked>
+            </div>
+            <div class="field">
+                <label for="enable_stretch">⑨文字拉升变形：</label>
+                <input type="checkbox" id="enable_stretch" checked>
+                X <input type="number" id="stretch_x_min" value="0.85" step="0.05"> ~ <input type="number" id="stretch_x_max" value="1.15" step="0.05">
+                Y <input type="number" id="stretch_y_min" value="0.85" step="0.05"> ~ <input type="number" id="stretch_y_max" value="1.15" step="0.05">
+            </div>
+            <div class="actions">
+                <button class="btn" onclick="textToImg()">生成图片</button>
+                <a href="https://github.com/Leisurelybear/ocr-bye">
+                    <img src="https://img.shields.io/badge/Visit_OCR--BYE-v1.0-green?logo=github&style=flat" alt="Github">
+                </a>
+                <a href="https://blog.lebear.top/">
+                    <img src="https://img.shields.io/badge/Visit_HomePage-Lebear-blue" alt="HomePage">
+                </a>
+            </div>
+            <div class="tips">提示：建议干扰线数量设置为 6 以上，左中右覆盖更均衡。</div>
         </div>
-    </td>
-</tr>
-<tr>
-    <td></td>
-    <td><div>
-        <label for="word_num">①每行字數（【大于0】）：</label>
-        <input type="number" id="word_num" min="10" value="20">个
-    </div></td>
-</tr>
-<tr>
-    <td></td>
-    <td><div>
-        <label for="word_size">②字體大小（【大于0】，單位：px）：</label>
-        <input type="number" id="word_size" min="1" value="20">
-    </div></td>
-</tr>
-<tr>
-    <td></td>
-    <td>
-        <div>
-            <label for="rotate_max">③文字旋转角度范围（【-180 ~ 180】，單位：°）：</label>
-            最小角度=<input type="number" id="rotate_min" value="0">
-            <b> ~ </b>
-            最大角度=<input type="number" id="rotate_max" value="360">
+        <div class="card">
+            <h2>输出结果</h2>
+            <img id="img-base64" alt="生成图片"/>
+            <div class="actions">
+                <button class="btn" id="copy-btn">复制图片</button>
+                <span id="alert"></span>
+            </div>
         </div>
-    </td>
-</tr>
-<tr>
-    <td></td>
-    <td>
-        <div>
-            <label for="rotate_max">④繪製干擾綫數量：</label>
-            <input type="number" id="line_nums" value="5">
-        </div>
-    </td>
-</tr>
-<tr>
-    <td></td>
-    <td>
-        <div>
-            <label for="rotate_max">⑤添加横格綫：</label>
-            <input type="checkbox" id="underline" checked>
-        </div>
-    </td>
-</tr>
-<tr>
-    <td></td>
-    <td>
-        <div>
-            <label for="enable_random_size">⑥文字随机大小：</label>
-            <input type="checkbox" id="enable_random_size" checked>
-            偏移范围=
-            <input type="number" id="size_delta_min" value="-2">
-            ~
-            <input type="number" id="size_delta_max" value="2">px
-        </div>
-    </td>
-</tr>
-<tr>
-    <td></td>
-    <td>
-        <div>
-            <label for="enable_random_line_width">⑦干扰线粗细随机：</label>
-            <input type="checkbox" id="enable_random_line_width" checked>
-            线宽范围=
-            <input type="number" id="line_width_min" value="0.8" step="0.1">
-            ~
-            <input type="number" id="line_width_max" value="2.2" step="0.1">
-        </div>
-    </td>
-</tr>
-<tr>
-    <td></td>
-    <td>
-        <div>
-            <label for="enable_martian">⑧火星文替换：</label>
-            <input type="checkbox" id="enable_martian" checked>
-        </div>
-    </td>
-</tr>
-<tr>
-    <td></td>
-    <td>
-        <div>
-            <label for="enable_stretch">⑨文字拉升变形：</label>
-            <input type="checkbox" id="enable_stretch" checked>
-            X轴=
-            <input type="number" id="stretch_x_min" value="0.85" step="0.05">
-            ~
-            <input type="number" id="stretch_x_max" value="1.15" step="0.05">
-            Y轴=
-            <input type="number" id="stretch_y_min" value="0.85" step="0.05">
-            ~
-            <input type="number" id="stretch_y_max" value="1.15" step="0.05">
-        </div>
-    </td>
-</tr>
-</tbody>
-<div>
-    <button onclick=textToImg();>生成图片</button>
-    <br>
-    <a href="https://github.com/Leisurelybear/ocr-bye">
-        <img src="https://img.shields.io/badge/Visit_OCR--BYE-v1.0-green?logo=github&style=flat" alt="Github">
-    </a>
-    <a href="https://blog.lebear.top/">
-        <img src="https://img.shields.io/badge/Visit_HomePage-Lebear-blue" alt="HomePage">
-    </a>
-
+    </div>
 </div>
-<div>
-    <p>文字圖片：</p>
-    <img id="img-base64" style="border: 1px solid"/>
-    <br/>
-    <button id="copy-btn">复制图片</button>
-    <span id="alert" style="display:none"></span>
-    <script>
-        const img = document.querySelector('#img-base64');
-        const copyBtn = document.querySelector('#copy-btn');
-        const alertBox = document.getElementById('alert');
-        timeoutID = ""
-        copyBtn.addEventListener('click', () => {
-            clearTimeout(timeoutID)
-            // 将图片渲染到canvas上
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
 
-            // 生成Blob对象
-            canvas.toBlob(blob => {
-                // 将Blob对象放入剪贴板
-                navigator.clipboard.write([
-                    new ClipboardItem({
-                        'image/png': blob
-                    })
-                ]).then(() => {
-                    showAlert('复制成功', true)
-                }).catch(() => {
-                    showAlert('复制失败，请手动复制', false)
-                });
-            }, 'image/png');
-        });
+<script>
+    textToImg()
+</script>
+<script>
+    const img = document.querySelector('#img-base64');
+    const copyBtn = document.querySelector('#copy-btn');
+    const alertBox = document.getElementById('alert');
+    let timeoutID = ""
+    copyBtn.addEventListener('click', () => {
+        clearTimeout(timeoutID)
+        // 将图片渲染到canvas上
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
 
-        function showAlert(message, success) {
-            alertBox.textContent = message;
-            alertBox.style.display = 'block';
-            if (success) {
-                alertBox.style.backgroundColor = 'green';
-            } else {
-                alertBox.style.backgroundColor = 'red';
-            }
-            timeoutID = setTimeout(() => {
-                alertBox.style.display = 'none';
-            }, 3000);
+        // 生成Blob对象
+        canvas.toBlob(blob => {
+            // 将Blob对象放入剪贴板
+            navigator.clipboard.write([
+                new ClipboardItem({
+                    'image/png': blob
+                })
+            ]).then(() => {
+                showAlert('复制成功', true)
+            }).catch(() => {
+                showAlert('复制失败，请手动复制', false)
+            });
+        }, 'image/png');
+    });
+
+    function showAlert(message, success) {
+        alertBox.textContent = message;
+        alertBox.style.display = 'block';
+        if (success) {
+            alertBox.style.backgroundColor = 'green';
+        } else {
+            alertBox.style.backgroundColor = 'red';
         }
-    </script>
-</div>
+        timeoutID = setTimeout(() => {
+            alertBox.style.display = 'none';
+        }, 3000);
+    }
+</script>
 
 </body>
 </html>

@@ -154,6 +154,78 @@ function textToImg() {
 
 }
 
+const CONFIG_STORAGE_KEY = "ocr-bye-config-v1"
+const CONFIG_IDS = [
+    "txt_content",
+    "word_num",
+    "word_size",
+    "rotate_min",
+    "rotate_max",
+    "line_nums",
+    "underline",
+    "enable_random_size",
+    "size_delta_min",
+    "size_delta_max",
+    "enable_random_line_width",
+    "line_width_min",
+    "line_width_max",
+    "enable_martian",
+    "enable_stretch",
+    "stretch_x_min",
+    "stretch_x_max",
+    "stretch_y_min",
+    "stretch_y_max"
+]
+
+function saveConfig() {
+    const config = {}
+    CONFIG_IDS.forEach(function (id) {
+        const element = document.getElementById(id)
+        if (!element) return
+        if (element.type === "checkbox") {
+            config[id] = element.checked
+        } else {
+            config[id] = element.value
+        }
+    })
+    localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify(config))
+}
+
+function loadConfig() {
+    const raw = localStorage.getItem(CONFIG_STORAGE_KEY)
+    if (!raw) return
+    try {
+        const config = JSON.parse(raw)
+        CONFIG_IDS.forEach(function (id) {
+            if (config[id] === undefined) return
+            const element = document.getElementById(id)
+            if (!element) return
+            if (element.type === "checkbox") {
+                element.checked = !!config[id]
+            } else {
+                element.value = config[id]
+            }
+        })
+    } catch (e) {
+        console.warn("读取历史配置失败，已忽略。", e)
+    }
+}
+
+function bindConfigPersistence() {
+    CONFIG_IDS.forEach(function (id) {
+        const element = document.getElementById(id)
+        if (!element) return
+        element.addEventListener("input", saveConfig)
+        element.addEventListener("change", saveConfig)
+    })
+}
+
+function initApp() {
+    loadConfig()
+    bindConfigPersistence()
+    textToImg()
+}
+
 // 生成随机数
 function random(min, max) {
     return Math.round(Math.random() * (max - min)) + min;

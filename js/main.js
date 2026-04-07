@@ -93,16 +93,17 @@ function textToImg() {
     let tb = document.createElement("table")
 
     // 这么多字总共需要多少行
-    let rows = words.length / rowWordNum
+    let rows = Math.ceil(words.length / rowWordNum)
     let wordIndex;
     for (let i = 0; i < rows; i++) {
         let tr = document.createElement("tr")
-        for (let j = 0; j < rowWordNum; j++) {
+        const currentRowWordNum = Math.min(rowWordNum, words.length - i * rowWordNum)
+        for (let j = 0; j < currentRowWordNum; j++) {
             wordIndex = i * rowWordNum + j
             // console.log(wordIndex, words[j])
             let td = document.createElement("td")
             let innerDiv = document.createElement("div")
-            innerDiv.innerText = words[wordIndex] ? words[wordIndex] : " "
+            innerDiv.innerText = words[wordIndex]
             // 字體旋轉 + 拉升變形
             const rotateDeg = random(wordRotateMin, wordRotateMax)
             const scaleX = enableStretch ? randomFloat(stretchXMin, stretchXMax) : 1
@@ -125,13 +126,9 @@ function textToImg() {
 
     toImgElement.appendChild(tb)
 
-    // 設置圖片大小
-    const maxDelta = enableRandomSize ? Math.max(Math.abs(sizeDeltaMin), Math.abs(sizeDeltaMax)) : 0
-    const maxStretchScale = enableStretch ? Math.max(stretchXMax, stretchYMax) : 1
-    const maxWordSize = (wordSize + maxDelta) * maxStretchScale
-    imgSizeX = rowWordNum * maxWordSize * 1.414
-    imgSizeY = (rows + 1) * maxWordSize * 1.414 // 勾股定理，根號2，+1為補償，防止漢字割裂
-    toImgElement.setAttribute("style", "width: " + imgSizeX + "px !important;height: " + imgSizeY + "px !important;")
+    // 讓容器尺寸由實際內容決定，避免右側/底部多餘空白
+    toImgElement.style.width = "fit-content"
+    toImgElement.style.height = "fit-content"
 
     // 添加橫格綫
     if (document.getElementById("underline").checked){
@@ -144,13 +141,15 @@ function textToImg() {
     // html 转换 canvas，canvas转换图片
     html2canvas(document.getElementById("toimg")).then(function (canvas) {
         let img = document.getElementById("img-base64");
+        const context = canvas.getContext("2d")
         for(let i = 0; i < line_nums; i++) {
             // 绘制干扰线
-            drawline(canvas, canvas.getContext("2d"), i, line_nums, enableRandomLineWidth, lineWidthMin, lineWidthMax)
+            drawline(canvas, context, i, line_nums, enableRandomLineWidth, lineWidthMin, lineWidthMax)
         }
-        img.src = canvas.toDataURL("image/png");
+        const croppedCanvas = cropCanvasTransparentEdge(canvas, 2)
+        img.src = croppedCanvas.toDataURL("image/png");
+        toImgElement.setAttribute("hidden", true)
     })
-    toImgElement.setAttribute("hidden", true)
 
 
 }
@@ -228,4 +227,49 @@ function convertToMartianText(text) {
         const candidates = martianMap[ch]
         return candidates[random(0, candidates.length - 1)]
     }).join("")
+}
+
+// 裁剪透明边，讓輸出圖片更貼合文字區域
+function cropCanvasTransparentEdge(canvas, padding) {
+    const context = canvas.getContext("2d")
+    const width = canvas.width
+    const height = canvas.height
+    const imageData = context.getImageData(0, 0, width, height).data
+
+    let minX = width
+    let minY = height
+    let maxX = -1
+    let maxY = -1
+
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            const alpha = imageData[(y * width + x) * 4 + 3]
+            if (alpha > 0) {
+                if (x < minX) minX = x
+                if (x > maxX) maxX = x
+                if (y < minY) minY = y
+                if (y > maxY) maxY = y
+            }
+        }
+    }
+
+    if (maxX < minX || maxY < minY) {
+        return canvas
+    }
+
+    const extra = Math.max(0, parseInt(padding) || 0)
+    minX = Math.max(0, minX - extra)
+    minY = Math.max(0, minY - extra)
+    maxX = Math.min(width - 1, maxX + extra)
+    maxY = Math.min(height - 1, maxY + extra)
+
+    const croppedWidth = maxX - minX + 1
+    const croppedHeight = maxY - minY + 1
+
+    const croppedCanvas = document.createElement("canvas")
+    croppedCanvas.width = croppedWidth
+    croppedCanvas.height = croppedHeight
+    const croppedContext = croppedCanvas.getContext("2d")
+    croppedContext.drawImage(canvas, minX, minY, croppedWidth, croppedHeight, 0, 0, croppedWidth, croppedHeight)
+    return croppedCanvas
 }

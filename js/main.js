@@ -141,12 +141,12 @@ function textToImg() {
     // html 转换 canvas，canvas转换图片
     html2canvas(document.getElementById("toimg")).then(function (canvas) {
         let img = document.getElementById("img-base64");
-        const context = canvas.getContext("2d")
+        const croppedCanvas = cropCanvasTransparentEdge(canvas, 2)
+        const context = croppedCanvas.getContext("2d")
         for(let i = 0; i < line_nums; i++) {
             // 绘制干扰线
-            drawline(canvas, context, i, line_nums, enableRandomLineWidth, lineWidthMin, lineWidthMax)
+            drawline(croppedCanvas, context, i, line_nums, enableRandomLineWidth, lineWidthMin, lineWidthMax)
         }
-        const croppedCanvas = cropCanvasTransparentEdge(canvas, 2)
         img.src = croppedCanvas.toDataURL("image/png");
         toImgElement.setAttribute("hidden", true)
     })

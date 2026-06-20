@@ -163,10 +163,98 @@
             background: transparent;
         }
 
+        input[type="color"] {
+            width: 36px;
+            height: 36px;
+            padding: 2px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            cursor: pointer;
+            vertical-align: middle;
+        }
+
+        select {
+            font-size: 14px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            padding: 5px 8px;
+            background: #fff;
+            color: #1f2937;
+        }
+
+        .dark-toggle {
+            float: right;
+            background: none;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            padding: 6px 12px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .dark-toggle:hover {
+            background: #e5e7eb;
+        }
+
         @media (max-width: 1080px) {
             .layout {
                 grid-template-columns: 1fr;
             }
+            .dark-toggle {
+                float: none;
+                margin-left: 8px;
+            }
+        }
+
+        /* Dark Mode */
+        body.dark-mode {
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+        body.dark-mode .card {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        body.dark-mode textarea {
+            background: #0f172a;
+            color: #e2e8f0;
+            border-color: #334155;
+        }
+        body.dark-mode textarea:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+        body.dark-mode input[type="number"],
+        body.dark-mode select {
+            background: #0f172a;
+            color: #e2e8f0;
+            border-color: #334155;
+        }
+        body.dark-mode input[type="color"] {
+            background: #0f172a;
+            border-color: #334155;
+        }
+        body.dark-mode label {
+            color: #cbd5e1;
+        }
+        body.dark-mode .tips {
+            color: #94a3b8;
+        }
+        body.dark-mode #img-base64 {
+            border-color: #334155;
+        }
+        body.dark-mode .dark-toggle {
+            border-color: #334155;
+            color: #e2e8f0;
+        }
+        body.dark-mode .dark-toggle:hover {
+            background: #334155;
+        }
+        body.dark-mode .btn {
+            background-color: #6366f1;
+        }
+        body.dark-mode .btn:hover {
+            background-color: #4f46e5;
         }
     </style>
 </head>
@@ -174,7 +262,10 @@
 
 <div id="toimg" class="html2canvas-container"></div>
 <div class="app">
-    <h1 class="title">OCR-BYE 文字转图片防 OCR 工具</h1>
+    <h1 class="title">
+        OCR-BYE 文字转图片防 OCR 工具
+        <button class="dark-toggle" id="dark-toggle" onclick="toggleDarkMode()" title="切换暗黑模式">🌙</button>
+    </h1>
     <div class="layout">
         <div class="card">
             <h2>输入与参数</h2>
@@ -222,8 +313,31 @@
                 X <input type="number" id="stretch_x_min" value="0.85" step="0.05"> ~ <input type="number" id="stretch_x_max" value="1.15" step="0.05">
                 Y <input type="number" id="stretch_y_min" value="0.85" step="0.05"> ~ <input type="number" id="stretch_y_max" value="1.15" step="0.05">
             </div>
+            <div class="field">
+                <label for="enable_bg">⑩背景颜色：</label>
+                <input type="checkbox" id="enable_bg">
+                <input type="color" id="bg_color" value="#ffffff">
+            </div>
+            <div class="field">
+                <label for="text_color">⑪文字颜色：</label>
+                <input type="color" id="text_color" value="#000000">
+            </div>
+            <div class="field">
+                <label for="font_family">⑫字体选择：</label>
+                <select id="font_family">
+                    <option value="Arial, sans-serif">Arial（默认）</option>
+                    <option value="'Times New Roman', serif">Times New Roman</option>
+                    <option value="'Microsoft YaHei', sans-serif">微软雅黑</option>
+                    <option value="SimSun, serif">宋体</option>
+                    <option value="KaiTi, serif">楷体</option>
+                    <option value="'Comic Sans MS', cursive">Comic Sans MS</option>
+                    <option value="YouYuan, sans-serif">幼圆</option>
+                    <option value="cursive">手写体</option>
+                </select>
+            </div>
             <div class="actions">
-                <button class="btn" onclick="textToImg()">生成图片</button>
+                <button class="btn" onclick="textToImg()">🔄 生成图片</button>
+                <button class="btn" onclick="resetConfig()" style="background-color:#6b7280;">↺ 重置配置</button>
                 <a href="https://github.com/Leisurelybear/ocr-bye">
                     <img src="https://img.shields.io/badge/Visit_OCR--BYE-v1.0-green?logo=github&style=flat" alt="Github">
                 </a>
@@ -231,34 +345,61 @@
                     <img src="https://img.shields.io/badge/Visit_HomePage-Lebear-blue" alt="HomePage">
                 </a>
             </div>
-            <div class="tips">提示：建议干扰线数量设置为 6 以上，左中右覆盖更均衡。</div>
+            <div class="tips">💡 提示：建议干扰线数量设置为 6 以上，左中右覆盖更均衡。按 Ctrl+Enter 快速生成。</div>
         </div>
         <div class="card">
             <h2>输出结果</h2>
             <img id="img-base64" alt="生成图片"/>
             <div class="actions">
-                <button class="btn" id="copy-btn">复制图片</button>
+                <button class="btn" id="copy-btn">📋 复制图片</button>
+                <button class="btn" onclick="downloadImage()" style="background-color:#059669;">⬇ 下载图片</button>
+                <select id="export_format" title="导出格式">
+                    <option value="png">PNG</option>
+                    <option value="jpeg">JPG</option>
+                    <option value="webp">WebP</option>
+                </select>
                 <span id="alert"></span>
             </div>
+            <div class="tips" id="output-tips">图片格式：PNG 支持透明背景，JPG 体积更小，WebP 兼具两者优势。</div>
         </div>
     </div>
 </div>
 
 <script>
     initApp()
+    // 暗黑模式初始加载
+    if (localStorage.getItem('ocr-bye-dark') === 'true') {
+        document.body.classList.add('dark-mode');
+        document.getElementById('dark-toggle').textContent = '☀️';
+    }
 </script>
 <script>
     const img = document.querySelector('#img-base64');
     const copyBtn = document.querySelector('#copy-btn');
     const alertBox = document.getElementById('alert');
-    let timeoutID = ""
+    const txtContent = document.getElementById('txt_content');
+    let timeoutID = null;
+
+    // Ctrl+Enter 快捷键生成图片
+    txtContent.addEventListener('keydown', function (e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            textToImg();
+        }
+    });
+
+    // 启用背景色时启用/禁用颜色选择器
+    document.getElementById('enable_bg').addEventListener('change', function () {
+        document.getElementById('bg_color').disabled = !this.checked;
+    });
+
     copyBtn.addEventListener('click', () => {
         clearTimeout(timeoutID)
         // 将图片渲染到canvas上
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = img.width;
-        canvas.height = img.height;
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
         ctx.drawImage(img, 0, 0);
 
         // 生成Blob对象
@@ -280,9 +421,9 @@
         alertBox.textContent = message;
         alertBox.style.display = 'block';
         if (success) {
-            alertBox.style.backgroundColor = 'green';
+            alertBox.style.backgroundColor = '#059669';
         } else {
-            alertBox.style.backgroundColor = 'red';
+            alertBox.style.backgroundColor = '#dc2626';
         }
         timeoutID = setTimeout(() => {
             alertBox.style.display = 'none';

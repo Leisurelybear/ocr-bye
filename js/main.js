@@ -48,6 +48,11 @@ function textToImg() {
     lineWidthMin = Math.max(0.1, lineWidthMin)
     lineWidthMax = Math.max(0.1, lineWidthMax)
 
+    const enableBg = document.getElementById("enable_bg").checked
+    const bgColor = document.getElementById("bg_color").value
+    const textColor = document.getElementById("text_color").value
+    const fontFamily = document.getElementById("font_family").value
+
     const enableMartian = document.getElementById("enable_martian").checked
     const enableStretch = document.getElementById("enable_stretch").checked
     let stretchXMin = parseFloat(document.getElementById("stretch_x_min").value)
@@ -124,7 +129,21 @@ function textToImg() {
         tb.appendChild(tr)
     }
 
+    // 设置文字颜色和字体
+    const allInnerDivs = tb.querySelectorAll("div")
+    allInnerDivs.forEach(function (div) {
+        div.style.color = textColor
+        div.style.fontFamily = fontFamily
+    })
+
     toImgElement.appendChild(tb)
+
+    // 背景颜色
+    if (enableBg) {
+        toImgElement.style.backgroundColor = bgColor
+    } else {
+        toImgElement.style.backgroundColor = "transparent"
+    }
 
     // 讓容器尺寸由實際內容決定，避免右側/底部多餘空白
     toImgElement.style.width = "fit-content"
@@ -174,7 +193,12 @@ const CONFIG_IDS = [
     "stretch_x_min",
     "stretch_x_max",
     "stretch_y_min",
-    "stretch_y_max"
+    "stretch_y_max",
+    "enable_bg",
+    "bg_color",
+    "text_color",
+    "font_family",
+    "export_format"
 ]
 
 function saveConfig() {
@@ -221,45 +245,100 @@ function bindConfigPersistence() {
 }
 
 function initApp() {
+    // 加载暗黑模式状态
+    if (localStorage.getItem('ocr-bye-dark') === 'true') {
+        document.body.classList.add('dark-mode');
+        const toggle = document.getElementById('dark-toggle');
+        if (toggle) toggle.textContent = '☀️';
+    }
     loadConfig()
+    // 启用背景色复选框状态同步
+    const enableBg = document.getElementById('enable_bg');
+    if (enableBg) {
+        document.getElementById('bg_color').disabled = !enableBg.checked;
+    }
     bindConfigPersistence()
     textToImg()
 }
 
-// 生成随机数
+// 下载图片（支持 PNG / JPG / WebP）
+function downloadImage() {
+    const img = document.getElementById("img-base64")
+    const format = document.getElementById("export_format").value
+    const link = document.createElement("a")
+    const mimeTypes = { png: "image/png", jpeg: "image/jpeg", webp: "image/webp" }
+    const ext = format === "jpeg" ? "jpg" : format
+
+    if (format === "png") {
+        link.download = "ocr-bye.png"
+        link.href = img.src
+    } else {
+        const canvas = document.createElement("canvas")
+        canvas.width = img.naturalWidth
+        canvas.height = img.naturalHeight
+        const ctx = canvas.getContext("2d")
+        // JPG 不支持透明，用白色填充
+        if (format === "jpeg") {
+            ctx.fillStyle = "#ffffff"
+            ctx.fillRect(0, 0, canvas.width, canvas.height)
+        }
+        ctx.drawImage(img, 0, 0)
+        link.download = "ocr-bye." + ext
+        link.href = canvas.toDataURL(mimeTypes[format], 0.92)
+    }
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+}
+
+// 切换暗黑模式
+function toggleDarkMode() {
+    document.body.classList.toggle("dark-mode")
+    const isDark = document.body.classList.contains("dark-mode")
+    localStorage.setItem("ocr-bye-dark", isDark)
+    document.getElementById("dark-toggle").textContent = isDark ? "☀️" : "🌙"
+}
+
+// 重置配置（清除本地存储后刷新页面）
+function resetConfig() {
+    if (!confirm("确认重置所有配置？")) return
+    localStorage.removeItem(CONFIG_STORAGE_KEY)
+    localStorage.removeItem("ocr-bye-dark")
+    location.reload()
+}
+
+// 生成随机整数（自动处理 min > max 情况）
 function random(min, max) {
+    if (min > max) { const t = min; min = max; max = t; }
     return Math.round(Math.random() * (max - min)) + min;
 }
 
-// 生成随机小数
+// 生成随机小数（自动处理 min > max 情况）
 function randomFloat(min, max) {
+    if (min > max) { const t = min; min = max; max = t; }
     return Math.random() * (max - min) + min;
 }
 
 // 绘制干扰线（按区域分配，保证左中右都有覆盖）
 function drawline(canvas, context, index, totalLines, enableRandomLineWidth, lineWidthMin, lineWidthMax) {
-    //若省略beginPath，则每点击一次验证码会累积干扰线的条数
     context.beginPath();
 
-    // 将画布横向分成3个区域，优先保证左中右都至少有线
-    const segments = Math.min(3, Math.max(1, canvas.width > 0 ? 3 : 1));
-    const segmentWidth = canvas.width / segments;
-    let segmentIndex = 0;
-    if (totalLines <= 1) {
-        segmentIndex = 1;
-    } else if (totalLines === 2) {
-        segmentIndex = index === 0 ? 0 : 2;
-    } else {
-        segmentIndex = index % segments;
-    }
-    const startMinX = Math.floor(segmentIndex * segmentWidth);
-    const startMaxX = Math.floor((segmentIndex + 1) * segmentWidth) - 1;
+    const w = Math.max(1, canvas.width);
+    const h = Math.max(1, canvas.height);
+    const segments = 3;
+    const segmentWidth = w / segments;
+    let segmentIndex = index % segments;
 
-    // 起点终点都优先落在当前分区，确保各区域密度更均衡
-    const startX = random(startMinX, Math.max(startMinX, startMaxX));
-    const startY = random(0, Math.max(0, canvas.height - 1));
-    const endX = random(startMinX, Math.max(startMinX, startMaxX));
-    const endY = random(0, Math.max(0, canvas.height - 1));
+    const segMinX = Math.floor(segmentIndex * segmentWidth);
+    const segMaxX = Math.floor((segmentIndex + 1) * segmentWidth) - 1;
+    // 当 segment 宽度 < 1 时保证有效范围
+    const rangeMin = Math.min(segMinX, Math.max(0, w - 1));
+    const rangeMax = Math.min(Math.max(segMinX, segMaxX), w - 1);
+
+    const startX = random(rangeMin, rangeMax);
+    const startY = random(0, h - 1);
+    const endX = random(rangeMin, rangeMax);
+    const endY = random(0, h - 1);
 
     context.moveTo(startX, startY);
     context.lineTo(endX, endY);
@@ -271,21 +350,70 @@ function drawline(canvas, context, index, totalLines, enableRandomLineWidth, lin
 // 火星文替换（常见字符做随机替换）
 function convertToMartianText(text) {
     const martianMap = {
-        "的": ["d", "啲", "の"],
-        "了": ["叻", "le", "ㄋ"],
-        "你": ["伱", "祢", "ní"],
-        "我": ["莪", "ω", "偶"],
-        "是": ["4", "惿", "si"],
-        "不": ["吥", "8", "卟"],
-        "很": ["狠", "hen", "哏"],
-        "吗": ["嗎", "嘛", "ma"],
-        "啊": ["吖", "阿", "a"],
-        "爱": ["嗳", "愛", "ai"],
-        "这": ["這", "zhe", "媞"],
-        "那": ["哪", "那", "na"],
-        "人": ["亽", "朲", "ren"],
-        "中": ["仲", "ф", "zhong"],
-        "国": ["國", "囯", "guo"]
+        "的": ["d", "啲", "の", "淂"],
+        "了": ["叻", "le", "ㄋ", "瞭"],
+        "你": ["伱", "祢", "ní", "妮"],
+        "我": ["莪", "ω", "偶", "俄"],
+        "是": ["4", "惿", "si", "囨"],
+        "不": ["吥", "8", "卟", "罘"],
+        "很": ["狠", "hen", "哏", "鞎"],
+        "吗": ["嗎", "嘛", "ma", "嬷"],
+        "啊": ["吖", "阿", "a", "腌"],
+        "爱": ["嗳", "愛", "ai", "艾"],
+        "这": ["這", "zhe", "媞", "柘"],
+        "那": ["哪", "那", "na", "娜"],
+        "人": ["亽", "朲", "ren", "魜"],
+        "中": ["仲", "ф", "zhong", "妕"],
+        "国": ["國", "囯", "guo", "囶"],
+        "有": ["冇", "you", "姷", "囿"],
+        "大": ["亣", "da", "汏", "畗"],
+        "小": ["尐", "晓", "尛", "𡭔"],
+        "上": ["仩", "丄", "鞤", "shang"],
+        "下": ["丅", "吓", "芐", "xia"],
+        "一": ["1", "壹", "弌", "①"],
+        "二": ["2", "贰", "弍", "②"],
+        "三": ["3", "叁", "弎", "③"],
+        "四": ["4", "肆", "䦉", "④"],
+        "五": ["5", "伍", "㐅", "⑤"],
+        "天": ["兲", "tian", "靝", "婖"],
+        "地": ["坔", "di", "埊", "嶳"],
+        "生": ["泩", "sheng", "甡", "鉎"],
+        "死": ["屍", "si", "尐", "舓"],
+        "可": ["妸", "ke", "渇", "奇"],
+        "以": ["妀", "已", "佁", "苡"],
+        "为": ["爲", "4", "位", "沩"],
+        "在": ["茬", "扗", "囮", "zai"],
+        "和": ["咊", "媧", "惒", "龢"],
+        "之": ["芝", "zhi", "㞢", "膌"],
+        "要": ["婹", "yao", "覞", "葽"],
+        "他": ["牠", "ta", "祂", "佗"],
+        "她": ["牠", "ta", "奼", "婨"],
+        "都": ["嘟", "dou", "醏", "闍"],
+        "好": ["嬡", "hao", "恏", "㚼"],
+        "能": ["耐", "neng", "竜", "螚"],
+        "会": ["會", "烩", "hui", "䢳"],
+        "个": ["個", "箇", "各", "ge"],
+        "看": ["睇", "kan", "䀎", "矙"],
+        "得": ["淂", "de", "嘚", "鍀"],
+        "就": ["僦", "jiu", "鹫", "蹴"],
+        "没": ["沒", "mei", "殁", "歾"],
+        "过": ["過", "guo", "菓", "鐹"],
+        "把": ["靶", "ba", "鈀", "爬"],
+        "对": ["對", "怼", "dui", "薱"],
+        "多": ["哆", "duo", "茤", "奓"],
+        "只": ["隻", "zhi", "淽", "枳"],
+        "来": ["來", "徕", "涞", "lei"],
+        "子": ["孑", "zi", "杍", "姉"],
+        "如": ["侞", "ru", "桇", "挐"],
+        "到": ["倒", "dao", "菿", "噵"],
+        "说": ["説", "曰", "shuo", "烁"],
+        "们": ["們", "们", "men", "扪"],
+        "去": ["厺", "qu", "佉", "阹"],
+        "着": ["著", "着", "zhao", "謶"],
+        "出": ["齣", "chu", "岀", "絀"],
+        "开": ["開", "kai", "闓", "锎"],
+        "心": ["芯", "xin", "訫", "惢"],
+        "风": ["風", "疯", "feng", "諷"]
     }
 
     return text.split("").map(function (ch) {

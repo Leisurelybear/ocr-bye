@@ -1,44 +1,75 @@
 # ocr-bye
-Stay away from OCR , convert your words into image which can not be recognized easily. 
-</br>
+
+Stay away from OCR, convert your words into image which can not be recognized easily.
+
 再见，OCR！远离OCR，将文字转换成OCR无法轻易识别的图片。
 
 ## Features
-- 文字单独随机旋转角度
-- 干扰线（左中右分区更均衡）
-- 文字设置大小
-- 生成图片自适应大小（导出时自动裁剪透明空白边）
-- 每行字数设置
-- 添加橫格綫
-- 文字随机大小
-- 干扰线粗细随机
-- 火星文替换
-- 文字拉升变形
-- 本地自动记忆上次配置（localStorage）
+
+- **文字随机旋转** - 每个字独立随机旋转角度
+- **干扰线** - 支持数量调节、粗细随机，左中右分区均衡覆盖
+- **文字拉升变形** - 支持 X/Y 轴独立缩放
+- **文字随机大小** - 每个字在指定偏移范围内随机字号
+- **火星文替换** - 60+ 常见汉字随机替换为形近字/符号
+- **横格线** - 添加文字底部横线，增强图片整齐度
+- **背景颜色** - 支持自定义背景色（或保持透明）
+- **文字颜色** - 支持自定义文字颜色
+- **字体选择** - 内置 8 种中英文字体
+- **导出多种格式** - PNG（支持透明）/ JPG（体积小）/ WebP（两者兼顾）
+- **一键下载** - 直接下载生成图片
+- **一键复制** - 复制图片到剪贴板
+- **暗黑模式** - 支持暗黑主题，护眼且美观
+- **Ctrl+Enter 快捷键** - 快速生成图片
+- **重置配置** - 一键恢复默认设置
+- **本地自动记忆** - 所有配置自动保存到 localStorage
 
 ## Configuration
-- 行列控制：`每行字数`、`字体大小`、`旋转角度范围`
-- 干扰控制：`干扰线数量`、`干扰线粗细随机`、`横格线`
-- 变形控制：`文字随机大小`、`文字拉升变形`
-- 文本处理：`火星文替换`
+
+| 模块 | 参数 |
+|------|------|
+| 行列控制 | 每行字数、字体大小、旋转角度范围 |
+| 干扰控制 | 干扰线数量、干扰线粗细随机、横格线 |
+| 变形控制 | 文字随机大小、文字拉升变形（XY独立） |
+| 文本处理 | 火星文替换（60+汉字） |
+| 样式控制 | 背景颜色、文字颜色、字体选择 |
+| 导出控制 | 导出格式（PNG/JPG/WebP） |
 
 ## Notes
+
 - 建议将干扰线数量设为 6 及以上，左中右覆盖更均衡。
+- 文字颜色和背景颜色搭配使用效果更佳。
+- JPG 格式不支持透明背景，导出时会自动填充白色。
 - 配置会自动保存在浏览器本地存储中，下次打开页面会自动恢复。
 
 ## Online Demo
+
 [Demo Page](https://blog.lebear.top/ocr-bye/)
 
 ## Get Start
+
 Put this project in anywhere you can visit, then open `index.html` with your browser.
 
 ## Snapshot
-Example：
+
+Example:
 ![示例](img/img1.png)
 Recognized Result by PandaOCR:
 ![示例2](img/img2.png)
 
 ## Updates
+
+### 26/06（当前版本）
+- 新增下载图片功能（支持 PNG / JPG / WebP 三种格式）
+- 新增自定义背景颜色、文字颜色
+- 新增字体选择（8种中英文字体）
+- 新增暗黑模式
+- 新增 Ctrl+Enter 快捷键生成
+- 新增重置配置按钮
+- 火星文字典扩展至 60+ 常用汉字
+- 修复干扰线在窄画布下的边界计算错误
+- 随机函数增加参数自动纠错
+- 优化图片复制逻辑（使用 naturalWidth/Height）
+- 优化按钮样式与交互反馈
 
 ### 26/04/07
 - 修复干扰线分布偏右问题，增强左中右区域覆盖
@@ -51,7 +82,7 @@ Recognized Result by PandaOCR:
 - 添加一键复制图片功能
 
 ### 23/04/08
-- 添加github action，自动部署demo
+- 添加 github action，自动部署 demo
 
 ### 23/04/08
 - 美化頁面結構（by chatGPT）

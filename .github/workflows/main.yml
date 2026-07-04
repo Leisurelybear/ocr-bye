@@ -1,7 +1,7 @@
 name: Deploy
 on: [push]
 env: 
-  CODE_HOME: "/home/jason/www/html/public/ocr-bye"
+  CODE_HOME: "/www/blog_posts/ocr-bye"
 jobs:
   my-job:
     runs-on: self-hosted
